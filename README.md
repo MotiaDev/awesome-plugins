@@ -14,6 +14,7 @@ A curated list of awesome plugins, tools, and resources for the [Motia](https://
 These plugins are maintained by the Motia team and are available in the official repository.
 
 - [@motiadev/plugin-endpoint](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-endpoint) - Interactive API endpoint testing and management tool. Visual endpoint explorer, request testing, and real-time discovery.
+- [@motiadev/plugin-bullmq](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-bullmq) - BullMQ queue and Dead Letter Queue (DLQ) management tool. Queue dashboard, job management, pause/resume operations, and DLQ retry capabilities.
 - [@motiadev/plugin-logs](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-logs) - Real-time log viewer with advanced search, filtering, and inspection capabilities.
 - [@motiadev/plugin-observability](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-observability) - Performance monitoring and distributed tracing visualization. Track execution steps and inspect requests/responses.
 - [@motiadev/plugin-states](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-states) - State management and inspection tool for Motia flows. Visual state explorer with real-time updates.
