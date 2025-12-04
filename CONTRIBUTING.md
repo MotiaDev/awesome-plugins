@@ -31,7 +31,6 @@ Already created a plugin? Here's how to add it to the awesome list:
 
 ### Submission Format Example
 
-```markdown
 ### @yourusername/motia-plugin-analytics
 
 [![npm version](https://badge.fury.io/js/%40yourusername%2Fmotia-plugin-analytics.svg)](https://www.npmjs.com/package/@yourusername/motia-plugin-analytics)
@@ -54,7 +53,6 @@ import analyticsPlugin from '@yourusername/motia-plugin-analytics/plugin'
 export default {
   plugins: [analyticsPlugin],
 }
-```
 ```
 
 ---
