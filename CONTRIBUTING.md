@@ -31,6 +31,7 @@ Already created a plugin? Here's how to add it to the awesome list:
 
 ### Submission Format Example
 
+```markdown
 ### @yourusername/motia-plugin-analytics
 
 [![npm version](https://badge.fury.io/js/%40yourusername%2Fmotia-plugin-analytics.svg)](https://www.npmjs.com/package/@yourusername/motia-plugin-analytics)
@@ -53,6 +54,7 @@ import analyticsPlugin from '@yourusername/motia-plugin-analytics/plugin'
 export default {
   plugins: [analyticsPlugin],
 }
+```
 ```
 
 ---
@@ -91,7 +93,7 @@ The fastest way to create a plugin:
 
 ```bash
 # Create a new plugin project
-pnpm dlx motia create --plugin my-awesome-plugin
+pnpm dlx motia@latest create --plugin my-awesome-plugin
 
 # Navigate to the plugin directory
 cd my-awesome-plugin
@@ -105,29 +107,30 @@ pnpm run build
 
 This generates a complete plugin project with:
 - ✅ TypeScript and React configuration
-- ✅ Build setup (tsdown)
+- ✅ Vite build setup
 - ✅ Example workbench UI component
 - ✅ All required dependencies
 
 ### Manual Setup
 
-If you want to understand or customize the plugin structure:
+If you want to understand or customize the plugin structure, here's what the CLI generates:
 
-#### 1. Create Project Structure
+#### 1. Project Structure
 
 ```
 my-awesome-plugin/
 ├── src/
 │   ├── components/
-│   │   └── my-feature-page.tsx    # Main UI component
-│   ├── index.ts                    # Package entry point
-│   ├── plugin.ts                   # Plugin definition
-│   └── styles.css                  # Tailwind styles
+│   │   └── example-page.tsx    # Main UI component
+│   ├── index.ts                 # Package entry point
+│   ├── plugin.ts                # Plugin definition
+│   └── styles.css               # Tailwind styles
 ├── package.json
-├── tsconfig.json
-├── tsdown.config.ts               # Build configuration
+├── pnpm-lock.yaml
+├── postcss.config.js            # PostCSS configuration
 ├── README.md
-└── LICENSE
+├── tsconfig.json
+└── vite.config.ts               # Vite build configuration
 ```
 
 #### 2. Configure `package.json`
@@ -149,42 +152,45 @@ my-awesome-plugin/
   },
   "exports": {
     ".": {
-      "development": "./src/index.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./plugin": {
-      "development": "./src/plugin.ts",
-      "default": "./dist/plugin.js"
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js",
+      "require": "./dist/plugin.cjs"
     },
-    "./package.json": "./package.json"
+    "./styles.css": "./dist/styles.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "vite build",
+    "dev": "vite build --watch",
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@motiadev/core": "^0.14.0",
-    "@motiadev/ui": "^0.14.0",
-    "react": "^19.0.0"
+    "@motiadev/core": "workspace:*",
+    "@motiadev/ui": "workspace:*"
   },
   "devDependencies": {
-    "@bosh-code/tsdown-plugin-tailwindcss": "^1.0.1",
-    "@rollup/plugin-babel": "^6.1.0",
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.7",
-    "babel-plugin-react-compiler": "^1.0.0",
-    "tailwindcss": "^4.1.17",
-    "tsdown": "^0.16.8",
-    "typescript": "^5.9.3"
+    "@tailwindcss/vite": "^4.0.0-beta.3",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.6",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^19.0.0",
+    "tailwindcss": "^4.0.0-beta.3",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.3.0"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
       "./plugin": "./dist/plugin.js",
-      "./package.json": "./package.json"
+      "./styles.css": "./dist/styles.css"
     }
   }
 }
@@ -214,10 +220,10 @@ export default function plugin(motia: MotiaPluginContext): MotiaPlugin {
     workbench: [
       {
         packageName: '@yourusername/motia-plugin-yourfeature',
-        cssImports: ['@yourusername/motia-plugin-yourfeature/dist/index.css'],
+        cssImports: ['@yourusername/motia-plugin-yourfeature/dist/styles.css'],
         label: 'Your Feature',
         position: 'bottom', // or 'top'
-        componentName: 'MyFeaturePage',
+        componentName: 'ExamplePage',
         labelIcon: 'sparkles', // lucide-react icon name
       },
     ],
@@ -233,7 +239,7 @@ export default function plugin(motia: MotiaPluginContext): MotiaPlugin {
 - `motia.eventAdapter` - Event system adapter
 - `motia.registerApi()` - Register custom API endpoints
 
-#### 4. Create UI Component (`src/components/my-feature-page.tsx`)
+#### 4. Create UI Component (`src/components/example-page.tsx`)
 
 ```typescript
 import { Badge, Button, Card } from '@motiadev/ui'
@@ -241,7 +247,7 @@ import { Sparkles } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 
-export const MyFeaturePage: React.FC = () => {
+export const ExamplePage: React.FC = () => {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -264,7 +270,7 @@ export const MyFeaturePage: React.FC = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <Sparkles className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold">Your Feature</h1>
+          <h1 className="text-3xl font-bold">Your Feature Plugin</h1>
           <Badge variant="info">v1.0.0</Badge>
         </div>
 
@@ -278,6 +284,27 @@ export const MyFeaturePage: React.FC = () => {
             </p>
           )}
         </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-2">Easy to Create</h3>
+            <p className="text-sm text-muted-foreground">
+              Build plugins with React, TypeScript, and Tailwind CSS
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-2">Integrated</h3>
+            <p className="text-sm text-muted-foreground">
+              Seamlessly integrate with Motia's workbench UI
+            </p>
+          </div>
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-2">Powerful</h3>
+            <p className="text-sm text-muted-foreground">
+              Access Motia's plugin context and APIs
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -294,95 +321,92 @@ export const MyFeaturePage: React.FC = () => {
 #### 5. Export Components (`src/index.ts`)
 
 ```typescript
-export { MyFeaturePage } from './components/my-feature-page'
+import './styles.css'
+
+export { ExamplePage } from './components/example-page'
 ```
 
 #### 6. Add Styles (`src/styles.css`)
 
 ```css
-@import 'tailwindcss';
+@import "@motiadev/ui/globals.css";
+@import "tailwindcss";
 ```
 
-#### 7. Configure Build (`tsdown.config.ts`)
+#### 7. Configure Vite Build (`vite.config.ts`)
 
 ```typescript
-import { tailwindPlugin } from '@bosh-code/tsdown-plugin-tailwindcss'
-import pluginBabel from '@rollup/plugin-babel'
-import { defineConfig } from 'tsdown'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
+import { defineConfig } from 'vite'
+import dts from 'vite-plugin-dts'
 
-export default defineConfig([
-  // Main JavaScript/TypeScript build
-  {
-    entry: {
-      index: './src/index.ts',
-      plugin: './src/plugin.ts',
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    dts({ insertTypesEntry: true }),
+  ],
+  build: {
+    lib: {
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        plugin: resolve(__dirname, 'src/plugin.ts'),
+      },
+      name: 'MotiaPluginYourFeature',
+      formats: ['es', 'cjs'],
+      fileName: (format, entryName) => 
+        `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },
-    format: 'esm',
-    platform: 'browser',
-    external: [/^react($|\/)/, 'react/jsx-runtime'],
-    dts: {
-      build: true,
-    },
-    exports: {
-      devExports: 'development',
-    },
-    clean: true,
-    outDir: 'dist',
-    plugins: [
-      pluginBabel({
-        babelHelpers: 'bundled',
-        parserOpts: {
-          sourceType: 'module',
-          plugins: ['jsx', 'typescript'],
+    rollupOptions: {
+      external: ['react', 'react-dom', '@motiadev/core', '@motiadev/ui'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
         },
-        plugins: ['babel-plugin-react-compiler'],
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      }),
-    ],
-  },
-  // Separate CSS build
-  {
-    entry: {
-      index: './src/styles.css',
+      },
     },
-    format: 'esm',
-    platform: 'browser',
-    outDir: 'dist',
-    clean: false,
-    plugins: [
-      tailwindPlugin({
-        minify: process.env.NODE_ENV === 'prod',
-      }),
-    ],
+    cssCodeSplit: false,
   },
-])
+})
 ```
 
-#### 8. TypeScript Configuration (`tsconfig.json`)
+#### 8. PostCSS Configuration (`postcss.config.js`)
+
+```javascript
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+#### 9. TypeScript Configuration (`tsconfig.json`)
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    "strict": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
 }
 ```
 
-#### 9. Build Your Plugin
+#### 10. Build Your Plugin
 
 ```bash
 # Install dependencies
@@ -473,7 +497,7 @@ export default {
 
 ```bash
 # In your Motia project
-pnpm run dev
+npx motia dev
 
 # Open workbench and verify your plugin appears
 # Test all functionality
@@ -550,6 +574,8 @@ Before publishing, ensure:
 - ✅ Plugin has been tested in a real Motia project
 - ✅ Version number follows semantic versioning
 - ✅ CHANGELOG.md documents changes (recommended)
+- ✅ `dist/` folder contains all necessary files
+- ✅ CSS is properly exported in `package.json`
 
 ---
 
@@ -733,7 +759,7 @@ Set the following environment variables:
 Add any dependencies your plugin needs:
 
 ```bash
-pnpm add bullmq ioredis date-fns @tanstack/react-query
+pnpm add axios zustand date-fns
 ```
 
 Update `package.json`:
@@ -741,10 +767,9 @@ Update `package.json`:
 ```json
 {
   "dependencies": {
-    "bullmq": "^5.63.0",
-    "ioredis": "^5.8.2",
-    "date-fns": "^3.6.0",
-    "@tanstack/react-query": "^5.62.0"
+    "axios": "^1.6.0",
+    "zustand": "^4.5.0",
+    "date-fns": "^3.0.0"
   }
 }
 ```
@@ -801,10 +826,10 @@ Study these official plugins for inspiration:
 
 **Solutions:**
 - ✅ Verify CSS is imported in `src/index.ts`
-- ✅ Check `cssImports` path in `src/plugin.ts` points to correct file
-- ✅ Ensure TailwindCSS is properly configured in `tsdown.config.ts`
+- ✅ Check `cssImports` path in `src/plugin.ts` points to `dist/styles.css`
+- ✅ Ensure Tailwind is configured in `vite.config.ts`
 - ✅ Rebuild plugin: `pnpm run build`
-- ✅ Check that `dist/index.css` exists after build
+- ✅ Check that `dist/styles.css` exists after build
 - ✅ Verify PostCSS configuration
 
 ### Type Errors
@@ -815,7 +840,7 @@ Study these official plugins for inspiration:
 - ✅ List `@motiadev/core` and `@motiadev/ui` in `peerDependencies`, not `dependencies`
 - ✅ Run `pnpm install` to resolve peer dependencies
 - ✅ Set `declaration: true` in `tsconfig.json`
-- ✅ Check TypeScript version compatibility (use ^5.9.0)
+- ✅ Check TypeScript version compatibility (use ^5.7.0)
 - ✅ Rebuild with `pnpm run build` to regenerate type definitions
 - ✅ Ensure `dist/` contains `.d.ts` files
 
@@ -826,10 +851,11 @@ Study these official plugins for inspiration:
 **Solutions:**
 - ✅ Check all imports are correct
 - ✅ Ensure all dependencies are installed
-- ✅ Verify `tsdown.config.ts` configuration
+- ✅ Verify `vite.config.ts` configuration
 - ✅ Check for TypeScript errors: `tsc --noEmit`
 - ✅ Clear build cache: `pnpm run clean && pnpm run build`
 - ✅ Update dependencies to compatible versions
+- ✅ Ensure Vite and React plugins are installed
 
 ### Plugin Works Locally But Not After Publishing
 
@@ -837,11 +863,12 @@ Study these official plugins for inspiration:
 
 **Solutions:**
 - ✅ Check `files` field in `package.json` includes `dist/`
-- ✅ Verify `exports` in `publishConfig` are correct
+- ✅ Verify `exports` in `package.json` are correct
 - ✅ Test with `npm pack` and inspect the tarball before publishing
 - ✅ Ensure peer dependencies match consumer's versions
-- ✅ Check external dependencies are correctly configured in build
+- ✅ Check external dependencies are correctly configured in Vite
 - ✅ Rebuild before publishing: `pnpm run clean && pnpm run build`
+- ✅ Verify CSS file is included in the package
 
 ---
 
@@ -861,8 +888,8 @@ If you're stuck or have questions:
 
 Creating and contributing a Motia plugin:
 
-1. ✅ **Create:** `pnpm dlx motia create --plugin my-plugin`
-2. ✅ **Develop:** Build your plugin with React, TypeScript, and Motia UI
+1. ✅ **Create:** `pnpm dlx motia@latest create --plugin my-plugin`
+2. ✅ **Develop:** Build your plugin with React, TypeScript, Vite, and Motia UI
 3. ✅ **Test:** Link locally and test thoroughly in a Motia project
 4. ✅ **Document:** Write comprehensive README with examples and screenshots
 5. ✅ **Publish:** `npm publish --access public`
@@ -875,3 +902,4 @@ Creating and contributing a Motia plugin:
 ## License
 
 This repository and its contents are licensed under the [MIT License](LICENSE). See the LICENSE file for details.
+
