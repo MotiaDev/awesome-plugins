@@ -171,20 +171,20 @@ my-awesome-plugin/
     "dev": "vite build --watch",
     "clean": "rm -rf dist"
   },
-  "peerDependencies": {
-    "@motiadev/core": "workspace:*",
-    "@motiadev/ui": "workspace:*"
-  },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0-beta.3",
-    "@types/node": "^22.10.5",
-    "@types/react": "^19.0.6",
-    "@vitejs/plugin-react": "^4.3.4",
-    "react": "^19.0.0",
-    "tailwindcss": "^4.0.0-beta.3",
-    "typescript": "^5.7.3",
-    "vite": "^6.0.7",
-    "vite-plugin-dts": "^4.3.0"
+    "@motiadev/core": "latest",
+    "@motiadev/ui": "latest",
+    "@tailwindcss/postcss": "^4.1.16",
+    "@tailwindcss/vite": "^4.1.16",
+    "@types/node": "^24.9.2",
+    "@types/react": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "postcss": "^8.5.6",
+    "react": "^19.2.0",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12",
+    "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
     "exports": {
@@ -242,68 +242,64 @@ export default function plugin(motia: MotiaPluginContext): MotiaPlugin {
 #### 4. Create UI Component (`src/components/example-page.tsx`)
 
 ```typescript
-import { Badge, Button, Card } from '@motiadev/ui'
+import { Badge, Button } from '@motiadev/ui'
 import { Sparkles } from 'lucide-react'
 import type React from 'react'
-import { useEffect, useState } from 'react'
 
 export const ExamplePage: React.FC = () => {
-  const [data, setData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Fetch data from your custom API
-    fetch('/__motia/my-plugin/data')
-      .then(res => res.json())
-      .then(data => {
-        setData(data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.error('Failed to fetch data:', err)
-        setLoading(false)
-      })
-  }, [])
-
   return (
     <div className="h-full w-full p-6 overflow-auto">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <Sparkles className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold">Your Feature Plugin</h1>
+          <h1 className="text-3xl font-bold">Example Plugin</h1>
           <Badge variant="info">v1.0.0</Badge>
         </div>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Welcome!</h2>
-          {loading ? (
-            <p className="text-muted-foreground">Loading...</p>
-          ) : (
-            <p className="text-muted-foreground">
-              {data?.message || 'No data available'}
-            </p>
-          )}
-        </Card>
+        <p className="text-muted-foreground text-lg">
+          Welcome to the example plugin! This demonstrates the basic structure and functionality of a Motia plugin.
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border rounded-lg">
-            <h3 className="font-semibold mb-2">Easy to Create</h3>
-            <p className="text-sm text-muted-foreground">
-              Build plugins with React, TypeScript, and Tailwind CSS
-            </p>
+        <div className="p-6 space-y-4">
+          <h2 className="text-xl font-semibold">What is this?</h2>
+          <p className="text-muted-foreground">
+            This is a minimal example plugin that shows how to create custom workbench tabs in Motia. Plugins can extend
+            the Motia workbench with custom functionality, visualizations, and tools.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold mb-2">Easy to Create</h3>
+              <p className="text-sm text-muted-foreground">Build plugins with React, TypeScript, and Tailwind CSS</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold mb-2">Integrated</h3>
+              <p className="text-sm text-muted-foreground">Seamlessly integrate with Motia's workbench UI</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold mb-2">Powerful</h3>
+              <p className="text-sm text-muted-foreground">Access Motia's plugin context and APIs</p>
+            </div>
           </div>
-          <div className="p-4 border rounded-lg">
-            <h3 className="font-semibold mb-2">Integrated</h3>
-            <p className="text-sm text-muted-foreground">
-              Seamlessly integrate with Motia's workbench UI
-            </p>
+
+          <div className="flex gap-2 mt-6">
+            <Button variant="default">
+              <Sparkles className="w-4 h-4" />
+              Get Started
+            </Button>
+            <Button variant="outline">View Documentation</Button>
           </div>
-          <div className="p-4 border rounded-lg">
-            <h3 className="font-semibold mb-2">Powerful</h3>
-            <p className="text-sm text-muted-foreground">
-              Access Motia's plugin context and APIs
-            </p>
-          </div>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <h2 className="text-xl font-semibold">Plugin Features</h2>
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li>Custom workbench tabs with position control (top/bottom)</li>
+            <li>Access to Motia's UI components library</li>
+            <li>Integration with state management and APIs</li>
+            <li>Real-time updates through streams</li>
+            <li>TypeScript support with full type safety</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -361,14 +357,13 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['react', 'react-dom', '@motiadev/core', '@motiadev/ui'],
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
     },
     cssCodeSplit: false,
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
   },
 })
 ```
@@ -392,14 +387,22 @@ export default {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
     "jsx": "react-jsx",
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]
@@ -767,9 +770,7 @@ Update `package.json`:
 ```json
 {
   "dependencies": {
-    "axios": "^1.6.0",
-    "zustand": "^4.5.0",
-    "date-fns": "^3.0.0"
+    "lucide-react": "^0.548.0"
   }
 }
 ```
@@ -779,6 +780,8 @@ Update `package.json`:
 ## Examples and References
 
 ### Official Plugins Reference
+
+> **Note:** The CLI (`pnpm dlx motia@latest create --plugin`) generates **Vite-based** plugins, which is the recommended and current approach. Some plugins in the monorepo (like `plugin-example`) still use `tsdown` and are being migrated. For new plugins, always follow the Vite-based structure shown in this guide.
 
 Study these official plugins for inspiration:
 
