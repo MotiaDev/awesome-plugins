@@ -105,7 +105,7 @@ pnpm run build
 
 This generates a complete plugin project with:
 - ✅ TypeScript and React configuration
-- ✅ Vite build setup
+- ✅ tsdown for fast, performant builds with React Compiler and Tailwind CSS v4
 - ✅ Example workbench UI component
 - ✅ All required dependencies
 
@@ -128,7 +128,7 @@ my-awesome-plugin/
 ├── postcss.config.js            # PostCSS configuration
 ├── README.md
 ├── tsconfig.json
-└── vite.config.ts               # Vite build configuration
+└── tsdown.config.ts             # tsdown build/bundle configuration
 ```
 
 #### 2. Configure `package.json`
@@ -150,45 +150,45 @@ my-awesome-plugin/
   },
   "exports": {
     ".": {
+      "development": "./dist/index.development.js",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./plugin": {
+      "development": "./dist/plugin.development.js",
       "types": "./dist/plugin.d.ts",
-      "import": "./dist/plugin.js",
-      "require": "./dist/plugin.cjs"
+      "import": "./dist/plugin.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/index.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
-    "dev": "vite build --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@motiadev/core": "latest",
     "@motiadev/ui": "latest",
+    "@rollup/plugin-babel": "^6.0.4",
     "@tailwindcss/postcss": "^4.1.16",
-    "@tailwindcss/vite": "^4.1.16",
     "@types/node": "^24.9.2",
     "@types/react": "^19.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
+    "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "postcss": "^8.5.6",
     "react": "^19.2.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "tailwindcss": "^4.1.16",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.12",
-    "vite-plugin-dts": "^4.5.4"
+    "tsdown": "^0.12.5",
+    "typescript": "^5.9.3"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
       "./plugin": "./dist/plugin.js",
-      "./styles.css": "./dist/styles.css"
+      "./styles.css": "./dist/index.css"
     }
   }
 }
@@ -327,44 +327,61 @@ export { ExamplePage } from './components/example-page'
 @import "tailwindcss";
 ```
 
-#### 7. Configure Vite Build (`vite.config.ts`)
+#### 7. Configure tsdown for Bundling (`tsdown.config.ts`)
 
 ```typescript
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
+import pluginBabel from '@rollup/plugin-babel'
+import postcss from 'rollup-plugin-postcss'
+import { defineConfig } from 'tsdown'
 
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    dts({ insertTypesEntry: true }),
-  ],
-  build: {
-    lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        plugin: resolve(__dirname, 'src/plugin.ts'),
-      },
-      name: 'MotiaPluginYourFeature',
-      formats: ['es', 'cjs'],
-      fileName: (format, entryName) => 
-        `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
+export default defineConfig([
+  // Main JavaScript/TypeScript build
+  {
+    entry: {
+      index: './src/index.ts',
+      plugin: './src/plugin.ts',
     },
-    rollupOptions: {
-      external: ['react', 'react-dom', '@motiadev/core', '@motiadev/ui'],
-    },
-    cssCodeSplit: false,
+    format: 'esm',
+    platform: 'browser',
+    external: [/^react($|\/)/, 'react/jsx-runtime'],
+    dts: { build: true },
+    exports: { devExports: 'development' },
+    clean: true,
+    publint: true,
+    unused: true,
+    outDir: 'dist',
+    plugins: [
+      pluginBabel({
+        babelHelpers: 'bundled',
+        plugins: ['babel-plugin-react-compiler'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      }),
+    ],
   },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-    },
+  // Separate CSS build
+  {
+    entry: { index: './src/styles.css' },
+    format: 'esm',
+    platform: 'browser',
+    outDir: 'dist',
+    clean: false,
+    plugins: [
+      postcss({
+        extract: true,
+        minimize: process.env.NODE_ENV === 'prod',
+      }),
+    ],
   },
-})
+])
 ```
+
+**Benefits of tsdown for bundling:**
+- ✅ Faster, more performant builds than alternatives
+- ✅ Consistency with other Motia packages
+- ✅ Simpler configuration with sensible defaults
+- ✅ Built-in TypeScript declarations generation
+- ✅ React Compiler optimization via Babel plugin
+- ✅ Development exports for HMR support
 
 #### 8. PostCSS Configuration (`postcss.config.js`)
 
@@ -779,7 +796,7 @@ Update `package.json`:
 
 ### Official Plugins Reference
 
-> **Note:** The CLI (`pnpm dlx motia@latest create --plugin`) generates **Vite-based** plugins, which is the recommended and current approach. Some plugins in the monorepo (like `plugin-example`) still use `tsdown` and are being migrated. For new plugins, always follow the Vite-based structure shown in this guide.
+> **Note:** The CLI (`pnpm dlx motia@latest create --plugin`) generates plugins that use **tsdown** for fast, performant bundling with React Compiler and Tailwind CSS v4 support. All official plugins in the monorepo use tsdown for a consistent build experience across the Motia ecosystem.
 
 Study these official plugins for inspiration:
 
@@ -827,11 +844,11 @@ Study these official plugins for inspiration:
 
 **Solutions:**
 - ✅ Verify CSS is imported in `src/index.ts`
-- ✅ Check `cssImports` path in `src/plugin.ts` points to `dist/styles.css`
-- ✅ Ensure Tailwind is configured in `vite.config.ts`
+- ✅ Check `cssImports` path in `src/plugin.ts` points to `dist/index.css`
+- ✅ Ensure PostCSS is configured in `tsdown.config.ts`
 - ✅ Rebuild plugin: `pnpm run build`
-- ✅ Check that `dist/styles.css` exists after build
-- ✅ Verify PostCSS configuration
+- ✅ Check that `dist/index.css` exists after build
+- ✅ Verify PostCSS configuration in `postcss.config.js`
 
 ### Type Errors
 
@@ -852,11 +869,11 @@ Study these official plugins for inspiration:
 **Solutions:**
 - ✅ Check all imports are correct
 - ✅ Ensure all dependencies are installed
-- ✅ Verify `vite.config.ts` configuration
+- ✅ Verify `tsdown.config.ts` configuration
 - ✅ Check for TypeScript errors: `tsc --noEmit`
 - ✅ Clear build cache: `pnpm run clean && pnpm run build`
 - ✅ Update dependencies to compatible versions
-- ✅ Ensure Vite and React plugins are installed
+- ✅ Ensure tsdown and Babel plugins are installed
 
 ### Plugin Works Locally But Not After Publishing
 
@@ -867,7 +884,7 @@ Study these official plugins for inspiration:
 - ✅ Verify `exports` in `package.json` are correct
 - ✅ Test with `npm pack` and inspect the tarball before publishing
 - ✅ Ensure peer dependencies match consumer's versions
-- ✅ Check external dependencies are correctly configured in Vite
+- ✅ Check external dependencies are correctly configured in tsdown
 - ✅ Rebuild before publishing: `pnpm run clean && pnpm run build`
 - ✅ Verify CSS file is included in the package
 
@@ -890,7 +907,7 @@ If you're stuck or have questions:
 Creating and contributing a Motia plugin:
 
 1. ✅ **Create:** `pnpm dlx motia@latest create --plugin my-plugin`
-2. ✅ **Develop:** Build your plugin with React, TypeScript, Vite, and Motia UI
+2. ✅ **Develop:** Build your plugin with React, TypeScript, tsdown, and Motia UI
 3. ✅ **Test:** Link locally and test thoroughly in a Motia project
 4. ✅ **Document:** Write comprehensive README with examples and screenshots
 5. ✅ **Publish:** `npm publish --access public`
