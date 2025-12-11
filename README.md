@@ -21,6 +21,7 @@ These plugins are maintained by the Motia team and are available in the official
 - [@motiadev/plugin-example](https://github.com/MotiaDev/motia/tree/main/plugins/plugin-example) - A minimal example plugin demonstrating the plugin system architecture and UI component integration.
 
 ## Community Plugins
+- [@potatocoder/ws-plugin](https://github.com/Rohithgilla12/motia-ws-plugin) - A Motia workbench plugin for real-time WebSocket log monitoring and debugging.
 
 *Have a cool plugin? [Submit a PR](CONTRIBUTING.md) to add it here!*
 
