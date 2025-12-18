@@ -143,7 +143,7 @@ my-awesome-plugin/
   "types": "./dist/index.d.ts",
   "keywords": ["motia", "motia-plugin", "yourfeature"],
   "author": "Your Name",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/yourusername/motia-plugin-yourfeature"
@@ -919,5 +919,5 @@ Creating and contributing a Motia plugin:
 
 ## License
 
-This repository and its contents are licensed under the [MIT License](LICENSE). See the LICENSE file for details.
+This repository and its contents are licensed under the [Apache License 2.0](LICENSE). See the LICENSE file for details.
 
